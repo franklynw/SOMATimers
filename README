@@ -1,0 +1,13 @@
+For management of "performSelector:withObject:afterDelay:" calls - allows pausing, resuming & cancelling of specific timers (without having to remember details about which objects were passed, etc) - just keep a record of any timer ID that you might want to do stuff to later.
+
+New timers - call in the same way as "performSelector: etc etc" using "SOMATimerWithSelector:withObject:afterDelay:forDelegate:" or "SOMATimerWithSelector:withObject:withObject:afterDelay:forDelegate:" (added extra!) - each timer called returns a unique ID as NSString. Pass the owner for the timers to call when they trigger.
+
+Also available are grouped timers, which can be stopped & started by group name. The methods are the same as above, but you specify the group name by calling - "SOMATimerForGroup:withSelector: etc etc". Timers made without a group are kept in the @"application" group.
+  
+Suspend all the timers using "suspendAllTimers" (all timers in all groups) or individual timers (by passing the id which is returned when you call a timer) using "suspendTimer:myTimerID". Suspend all timers in a particular group using "suspendTimersForGroup:myGroupName".
+
+All timers can be resumed using "restartAllTimers" (all timers in all groups) or again, individual timers by passing their id using "restartTimer:myTimerID". Restart all timers in a particular group using "restartTimersForGroup:myGroupName".
+
+Calling a new timer doesn't affect the status (suspended or not) of existing timers, and a new timer is always active when you call it.
+
+Make sure you kill any timers which belong to a delegate which is released, as they will attempt to call the released delegate and crash - use "killTimersForGroup:myGroupName". To kill all timers in all groups, use "killAllTimers". This should be called in any case before releasing the SOMATimers object or the timers may continue & call the released object (crash...)
